@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out the code from the repository'
+                git branch: 'main', url: 'https://github.com/simao-campos87/devops-23-24-JPE-1231859.git'
+            }
+        }
+    stage('Assemble') {
+                steps {
+                    echo 'Assembling...'
+                    dir('CA2/part1/gradle_basic_demo') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean assemble'
+                    }
+                }
+            }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+                dir('CA2/part1/gradle_basic_demo') {
+                    sh './gradlew test'
+                    junit 'build/test-results/test/*.xml'
+                }
+            }
+        }
+        stage('Archive') {
+            steps {
+                echo 'Archiving...'
+                dir('CA2/part1/gradle_basic_demo') {
+                    archiveArtifacts 'build/libs/*.jar'
+                }
+            }
+        }
+    }
+}
